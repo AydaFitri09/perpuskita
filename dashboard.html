@@ -2,69 +2,41 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard Perpustakaan</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Dashboard</title>
   <style>
-    .dashboard-container {
-      background-color: white;
+    body {
+      font-family: Arial, sans-serif;
       padding: 40px;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      width: 350px;
+      background-color: #f4f4f4;
       text-align: center;
     }
-
-    .dashboard-container h2 {
-      margin-bottom: 30px;
+    h1 {
       color: #333;
     }
-
-    .dashboard-container button {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      font-size: 16px;
-      background-color: #2ecc71;
-      border: none;
+    .menu {
+      margin-top: 30px;
+    }
+    .menu a {
+      display: inline-block;
+      margin: 10px;
+      padding: 15px 25px;
+      background: #007bff;
       color: white;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background-color 0.3s;
+      text-decoration: none;
+      border-radius: 5px;
     }
-
-    .dashboard-container button:hover {
-      background-color: #27ae60;
-    }
-
-    .logout-button {
-      background-color: #e74c3c;
-    }
-
-    .logout-button:hover {
-      background-color: #c0392b;
+    .menu a:hover {
+      background: #0056b3;
     }
   </style>
 </head>
 <body>
-  <div class="dashboard-container">
-    <h2>Dashboard Perpustakaan</h2>
-
-    <button onclick="location.href='anggota.html'">📋 Data Anggota</button>
-    <button onclick="location.href='buku.html'">📚 Data Buku</button>
-    <button onclick="location.href='peminjaman.html'">📦 Data Peminjaman</button>
-    <button class="logout-button" onclick="logout()">🚪 Logout</button>
+  <h1>Selamat Datang di Dashboard Perpustakaan</h1>
+  <div class="menu">
+    <a href="anggota.html">Data Anggota</a>
+    <a href="buku.html">Data Buku</a>
+    <a href="peminjaman.html">Data Peminjaman</a>
+    <a href="index.html">Logout</a>
   </div>
-
-  <script>
-    // Cek login
-    if (localStorage.getItem("isLoggedIn") !== "true") {
-      window.location.href = "index.html";
-    }
-
-    function logout() {
-      localStorage.removeItem("isLoggedIn");
-      window.location.href = "index.html";
-    }
-  </script>
 </body>
 </html>
