@@ -1,18 +1,26 @@
-// Login sederhana (contoh)
-document.getElementById("loginForm").addEventListener("submit", function (e) {
-  e.preventDefault(); // mencegah reload halaman
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.querySelector("form");
 
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
+  if (form) {
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
 
-  // Ganti ini dengan username & password yang kamu mau
-  if (username === "admin" && password === "123") {
-    // Simpan sesi login di localStorage
-    localStorage.setItem("isLoggedIn", "true");
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
 
-    // Pindah ke dashboard
-    window.location.href = "dashboard.html";
-  } else {
-    document.getElementById("loginError").textContent = "Username atau password salah!";
+      if (username === "admin" && password === "12345") {
+        localStorage.setItem("isLoggedIn", "true");
+        window.location.href = "dashboard.html";
+      } else {
+        alert("Username atau password salah");
+      }
+    });
+  }
+
+  const halamanLogin = window.location.pathname.includes("index.html") || window.location.pathname === "/perpuskita/";
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+  if (!isLoggedIn && !halamanLogin) {
+    window.location.href = "index.html";
   }
 });
