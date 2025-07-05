@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Peminjaman</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    form input, form select {
+      padding: 10px;
+      margin: 5px;
+      width: calc(100% - 22px);
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+
+    button {
+      padding: 6px 12px;
+      margin: 2px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-edit { background-color: #f1c40f; color: white; }
+    .btn-delete { background-color: #e74c3c; color: white; }
+    .btn-kembali { background-color: #3498db; color: white; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Data Peminjaman</h2>
+
+    <form id="pinjamForm">
+      <input type="hidden" id="editIndex">
+      <input type="text" id="id_pinjam" placeholder="ID Peminjaman" required>
+      <input type="date" id="tanggal_pinjam" required>
+      <input type="number" id="jumlah_pinjam" placeholder="Jumlah" required>
+      <input type="date" id="tanggal_kembali" required>
+      <input type="text" id="id_anggota" placeholder="ID Anggota" required>
+      <input type="text" id="kode_buku" placeholder="Kode Buku" required>
+      <select id="kembali" required>
+        <option value="">-- Kembali? --</option>
+        <option value="1">Sudah</option>
+        <option value="0">Belum</option>
+      </select>
+      <button type="submit">Simpan</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tanggal Pinjam</th>
+          <th>Jumlah</th>
+          <th>Tanggal Kembali</th>
+          <th>ID Anggota</th>
+          <th>Kode Buku</th>
+          <th>Kembali</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="pinjamList"></tbody>
+    </table>
+
+    <button class="btn-kembali" onclick="location.href='dashboard.html'">⬅ Kembali ke Dashboard</button>
+  </div>
+
+  <script>
+    let peminjaman = JSON.parse(localStorage.getItem("peminjaman")) || [
+      {
+        id_pinjam: "12",
+        tanggal_pinjam: "2025-04-20",
+        jumlah_pinjam: "1",
+        tanggal_kembali: "2025-04-25",
+        id_anggota: "146231012",
+        kode_buku: "3",
+        kembali: "1"
+      },
+      {
+        id_pinjam: "15",
+        tanggal_pinjam: "2025-05-15",
+        jumlah_pinjam: "1",
+        tanggal_kembali: "2025-05-20",
+        id_anggota: "144231015",
+        kode_buku: "1",
+        kembali: "1"
+      },
+      {
+        id_pinjam: "18",
+        tanggal_pinjam: "2025-04-05",
+        jumlah_pinjam: "1",
+        tanggal_kembali: "2025-04-10",
+        id_anggota: "146231018",
+        kode_buku: "2",
+        kembali: "1"
+      },
+      {
+        id_pinjam: "23",
+        tanggal_pinjam: "2025-05-05",
+        jumlah_pinjam: "1",
+        tanggal_kembali: "2025-05-10",
+        id_anggota: "146231023",
+        kode_buku: "4",
+        kembali: "1"
+      },
+      {
+        id_pinjam: "24",
+        tanggal_pinjam: "2025-05-23",
+        jumlah_pinjam: "1",
+        tanggal_kembali: "2025-05-27",
+        id_anggota: "146231024",
+        kode_buku: "5",
+        kembali: "1"
+      }
+    ];
+
+    function simpanKeStorage() {
+      localStorage.setItem("peminjaman", JSON.stringify(peminjaman));
+    }
+
+    function tampilkanPeminjaman() {
+      const list = document.getElementById("pinjamList");
+      list.innerHTML = "";
+
+      peminjaman.forEach((item, index) => {
+        list.innerHTML += `
+          <tr>
+            <td>${item.id_pinjam}</td>
+            <td>${item.tanggal_pinjam}</td>
+            <td>${item.jumlah_pinjam}</td>
+            <td>${item.tanggal_kembali}</td>
+            <td>${item.id_anggota}</td>
+            <td>${item.kode_buku}</td>
+            <td>${item.kembali == "1" ? "Sudah" : "Belum"}</td>
+            <td>
+              <button class="btn-edit" onclick="editPinjam(${index})">Edit</button>
+              <button class="btn-delete" onclick="hapusPinjam(${index})">Hapus</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    document.getElementById("pinjamForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const data = {
+        id_pinjam: document.getElementById("id_pinjam").value,
+        tanggal_pinjam: document.getElementById("tanggal_pinjam").value,
+        jumlah_pinjam: document.getElementById("jumlah_pinjam").value,
+        tanggal_kembali: document.getElementById("tanggal_kembali").value,
+        id_anggota: document.getElementById("id_anggota").value,
+        kode_buku: document.getElementById("kode_buku").value,
+        kembali: document.getElementById("kembali").value
+      };
+
+      const editIndex = document.getElementById("editIndex").value;
+      if (editIndex === "") {
+        peminjaman.push(data);
+      } else {
+        peminjaman[editIndex] = data;
+        document.getElementById("editIndex").value = "";
+      }
+
+      simpanKeStorage();
+      tampilkanPeminjaman();
+      this.reset();
+    });
+
+    function editPinjam(index) {
+      const data = peminjaman[index];
+      document.getElementById("id_pinjam").value = data.id_pinjam;
+      document.getElementById("tanggal_pinjam").value = data.tanggal_pinjam;
+      document.getElementById("jumlah_pinjam").value = data.jumlah_pinjam;
+      document.getElementById("tanggal_kembali").value = data.tanggal_kembali;
+      document.getElementById("id_anggota").value = data.id_anggota;
+      document.getElementById("kode_buku").value = data.kode_buku;
+      document.getElementById("kembali").value = data.kembali;
+      document.getElementById("editIndex").value = index;
+    }
+
+    function hapusPinjam(index) {
+      if (confirm("Yakin mau menghapus data ini?")) {
+        peminjaman.splice(index, 1);
+        simpanKeStorage();
+        tampilkanPeminjaman();
+      }
+    }
+
+    tampilkanPeminjaman();
+  </script>
+</body>
+</html>

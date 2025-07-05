@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Anggota</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    form input, form select {
+      padding: 10px;
+      margin: 5px;
+      width: calc(100% - 22px);
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+
+    button {
+      padding: 6px 12px;
+      margin: 2px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-edit { background-color: #f1c40f; color: white; }
+    .btn-delete { background-color: #e74c3c; color: white; }
+    .btn-kembali { background-color: #3498db; color: white; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Data Anggota</h2>
+
+    <form id="anggotaForm">
+      <input type="hidden" id="editIndex">
+      <input type="text" id="id_anggota" placeholder="ID Anggota" required>
+      <input type="text" id="nama_anggota" placeholder="Nama Anggota" required>
+      <input type="text" id="alamat_anggota" placeholder="Alamat" required>
+      <input type="text" id="ttl_anggota" placeholder="Tempat Lahir" required>
+      <select id="status_anggota" required>
+        <option value="">-- Pilih Status --</option>
+        <option value="Mahasiswa">Mahasiswa</option>
+        <option value="Dosen">Dosen</option>
+        <option value="Umum">Umum</option>
+      </select>
+      <button type="submit">Simpan</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nama</th>
+          <th>Alamat</th>
+          <th>TTL</th>
+          <th>Status</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="anggotaList"></tbody>
+    </table>
+
+    <button class="btn-kembali" onclick="location.href='dashboard.html'">⬅ Kembali ke Dashboard</button>
+  </div>
+
+  <script>
+    // Data awal
+    let anggota = JSON.parse(localStorage.getItem("anggota")) || [
+      {
+        id_anggota: "144231015",
+        nama_anggota: "Siti Nasichatun Ulya",
+        alamat_anggota: "Ds.Klokah, Kec.Kunduran, Kab.Blora",
+        ttl_anggota: "Blora",
+        status_anggota: "Mahasiswa"
+      },
+      {
+        id_anggota: "146231012",
+        nama_anggota: "Selviana Pratama P",
+        alamat_anggota: "Ds.Tarub, Kec.Tawangharjo, Kab.Grobogan",
+        ttl_anggota: "Grobogan",
+        status_anggota: "Mahasiswa"
+      },
+      {
+        id_anggota: "146231018",
+        nama_anggota: "Laili Rizki NF",
+        alamat_anggota: "Ds.Crewek, Kec.Kradenan, Kab.Grobogan",
+        ttl_anggota: "Grobogan",
+        status_anggota: "Mahasiswa"
+      },
+      {
+        id_anggota: "146231023",
+        nama_anggota: "Ana Umi Fadila",
+        alamat_anggota: "Ds.Klokah, Kec.Kunduran, Kab.Blora",
+        ttl_anggota: "Blora",
+        status_anggota: "Mahasiswa"
+      },
+      {
+        id_anggota: "146231024",
+        nama_anggota: "Ayda Fitriani",
+        alamat_anggota: "Ds.Klokah, Kec.Kunduran, Kab.Blora",
+        ttl_anggota: "Blora",
+        status_anggota: "Mahasiswa"
+      }
+    ];
+
+    function simpanKeStorage() {
+      localStorage.setItem("anggota", JSON.stringify(anggota));
+    }
+
+    function tampilkanAnggota() {
+      const list = document.getElementById("anggotaList");
+      list.innerHTML = "";
+
+      anggota.forEach((item, index) => {
+        list.innerHTML += `
+          <tr>
+            <td>${item.id_anggota}</td>
+            <td>${item.nama_anggota}</td>
+            <td>${item.alamat_anggota}</td>
+            <td>${item.ttl_anggota}</td>
+            <td>${item.status_anggota}</td>
+            <td>
+              <button class="btn-edit" onclick="editAnggota(${index})">Edit</button>
+              <button class="btn-delete" onclick="hapusAnggota(${index})">Hapus</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    document.getElementById("anggotaForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const data = {
+        id_anggota: document.getElementById("id_anggota").value,
+        nama_anggota: document.getElementById("nama_anggota").value,
+        alamat_anggota: document.getElementById("alamat_anggota").value,
+        ttl_anggota: document.getElementById("ttl_anggota").value,
+        status_anggota: document.getElementById("status_anggota").value
+      };
+
+      const editIndex = document.getElementById("editIndex").value;
+      if (editIndex === "") {
+        anggota.push(data);
+      } else {
+        anggota[editIndex] = data;
+        document.getElementById("editIndex").value = "";
+      }
+
+      simpanKeStorage();
+      tampilkanAnggota();
+      this.reset();
+    });
+
+    function editAnggota(index) {
+      const data = anggota[index];
+      document.getElementById("id_anggota").value = data.id_anggota;
+      document.getElementById("nama_anggota").value = data.nama_anggota;
+      document.getElementById("alamat_anggota").value = data.alamat_anggota;
+      document.getElementById("ttl_anggota").value = data.ttl_anggota;
+      document.getElementById("status_anggota").value = data.status_anggota;
+      document.getElementById("editIndex").value = index;
+    }
+
+    function hapusAnggota(index) {
+      if (confirm("Yakin mau menghapus data ini?")) {
+        anggota.splice(index, 1);
+        simpanKeStorage();
+        tampilkanAnggota();
+      }
+    }
+
+    // Tampilkan saat halaman dibuka
+    tampilkanAnggota();
+  </script>
+</body>
+</html>

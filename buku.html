@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Buku</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    form input {
+      padding: 10px;
+      margin: 5px;
+      width: calc(100% - 22px);
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+
+    button {
+      padding: 6px 12px;
+      margin: 2px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-edit { background-color: #f1c40f; color: white; }
+    .btn-delete { background-color: #e74c3c; color: white; }
+    .btn-kembali { background-color: #3498db; color: white; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Data Buku</h2>
+
+    <form id="bukuForm">
+      <input type="hidden" id="editIndex">
+      <input type="text" id="kode_buku" placeholder="Kode Buku" required>
+      <input type="text" id="judul_buku" placeholder="Judul Buku" required>
+      <input type="text" id="pengarang_buku" placeholder="Pengarang" required>
+      <input type="text" id="jenis_buku" placeholder="Jenis Buku" required>
+      <input type="text" id="penerbit_buku" placeholder="Penerbit" required>
+      <button type="submit">Simpan</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Kode</th>
+          <th>Judul</th>
+          <th>Pengarang</th>
+          <th>Jenis</th>
+          <th>Penerbit</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="bukuList"></tbody>
+    </table>
+
+    <button class="btn-kembali" onclick="location.href='dashboard.html'">⬅ Kembali ke Dashboard</button>
+  </div>
+
+  <script>
+    let buku = JSON.parse(localStorage.getItem("buku")) || [
+      {
+        kode_buku: "1",
+        judul_buku: "Pengantar Teknik Informasi",
+        pengarang_buku: "Budi Santoso",
+        jenis_buku: "Pendidikan",
+        penerbit_buku: "Andi Publisher"
+      },
+      {
+        kode_buku: "2",
+        judul_buku: "Jaringan Komputer Dasar",
+        pengarang_buku: "Dian Prasetyo",
+        jenis_buku: "Teknologi",
+        penerbit_buku: "Elex Media Komputindo"
+      },
+      {
+        kode_buku: "3",
+        judul_buku: "Pemograman Python untuk Pemula",
+        pengarang_buku: "Rina Lestari",
+        jenis_buku: "Pemograman",
+        penerbit_buku: "Informatika Bandung"
+      },
+      {
+        kode_buku: "4",
+        judul_buku: "Keamanan Siber Modern",
+        pengarang_buku: "Andika Ramadhan",
+        jenis_buku: "Keamanan IT",
+        penerbit_buku: "Deepulish"
+      },
+      {
+        kode_buku: "5",
+        judul_buku: "Basis Data dan SQL",
+        pengarang_buku: "Siti Nur Haliza",
+        jenis_buku: "Database",
+        penerbit_buku: "Graha Ilmu"
+      }
+    ];
+
+    function simpanKeStorage() {
+      localStorage.setItem("buku", JSON.stringify(buku));
+    }
+
+    function tampilkanBuku() {
+      const list = document.getElementById("bukuList");
+      list.innerHTML = "";
+
+      buku.forEach((item, index) => {
+        list.innerHTML += `
+          <tr>
+            <td>${item.kode_buku}</td>
+            <td>${item.judul_buku}</td>
+            <td>${item.pengarang_buku}</td>
+            <td>${item.jenis_buku}</td>
+            <td>${item.penerbit_buku}</td>
+            <td>
+              <button class="btn-edit" onclick="editBuku(${index})">Edit</button>
+              <button class="btn-delete" onclick="hapusBuku(${index})">Hapus</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    document.getElementById("bukuForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const data = {
+        kode_buku: document.getElementById("kode_buku").value,
+        judul_buku: document.getElementById("judul_buku").value,
+        pengarang_buku: document.getElementById("pengarang_buku").value,
+        jenis_buku: document.getElementById("jenis_buku").value,
+        penerbit_buku: document.getElementById("penerbit_buku").value
+      };
+
+      const editIndex = document.getElementById("editIndex").value;
+      if (editIndex === "") {
+        buku.push(data);
+      } else {
+        buku[editIndex] = data;
+        document.getElementById("editIndex").value = "";
+      }
+
+      simpanKeStorage();
+      tampilkanBuku();
+      this.reset();
+    });
+
+    function editBuku(index) {
+      const data = buku[index];
+      document.getElementById("kode_buku").value = data.kode_buku;
+      document.getElementById("judul_buku").value = data.judul_buku;
+      document.getElementById("pengarang_buku").value = data.pengarang_buku;
+      document.getElementById("jenis_buku").value = data.jenis_buku;
+      document.getElementById("penerbit_buku").value = data.penerbit_buku;
+      document.getElementById("editIndex").value = index;
+    }
+
+    function hapusBuku(index) {
+      if (confirm("Yakin mau menghapus buku ini?")) {
+        buku.splice(index, 1);
+        simpanKeStorage();
+        tampilkanBuku();
+      }
+    }
+
+    tampilkanBuku();
+  </script>
+</body>
+</html>
